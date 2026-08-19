@@ -1,0 +1,72 @@
+Player Picks should only be open from Wednesday 12:00pm EST to Saturday 12:00pm EST
+
+If Home_Team_ATS is not Null
+
+	If Home_Team_ATS <= 0
+	{
+		Final_Game_Diff = Final Away - Final Home
+		Final_Home_Team_Score =  Final_Game_Diff
+		Final_Away_Team_Score =  -Final_Game_Diff
+		if (Final_Game_Diff < Home_Team_ATS) and LOCK 
+	            Result = 3
+		else if (Final_Game_Diff < Home_Team_ATS) and No LOCK 
+	            Result = 2
+		else if (Final_Game_Diff == Home_Team_ATS)
+		    Result = 1
+	        else if (Final_Game_Diff > Home_Team_ATS) and No Lock
+		    Result = 0
+		else if (Final_Game_Diff > Home_Team_ATS) and Lock
+	            Result = -1
+	}
+	else if Away_Team_ATS < 0
+	{
+		Final_Game_Diff = Final Home - Final Away
+		Final_Home_Team_Score =  -Final_Game_Diff
+		Final_Away_Team_Score =  Final_Game_Diff
+		if (Final_Game_Diff < Away_Team_ATS) and LOCK 
+	            Result = 3
+		else if (Final_Game_Diff < Away_Team_ATS) and No LOCK 
+	            Result = 2
+		else if (Final_Game_Diff == Away_Team_ATS)
+		    Result = 1
+	        else if (Final_Game_Diff > Away_Team_ATS) and No Lock
+		    Result = 0
+		else if (Final_Game_Diff > Away_Team_ATS) and Lock
+	            Result = -1
+	}
+If Away_Team_ATS is not Null
+
+	If Away_Team_ATS <= 0
+	{
+		Final_Game_Diff = Final Home - Final Away
+		Final_Home_Team_Score =  -Final_Game_Diff
+		Final_Away_Team_Score =  Final_Game_Diff
+		if (Final_Game_Diff < Away_Team_ATS) and LOCK 
+	            Result = 3
+		else if (Final_Game_Diff < Away_Team_ATS) and No LOCK 
+	            Result = 2
+		else if (Final_Game_Diff == Away_Team_ATS)
+		    Result = 1
+	        else if (Final_Game_Diff > Away_Team_ATS) and No Lock
+		    Result = 0
+		else if (Final_Game_Diff > Away_Team_ATS) and Lock
+	            Result = -1
+	}
+	else if Home_Team_ATS < 0
+	{
+		Final_Game_Diff = Final Away - Final Home
+		Final_Home_Team_Score =  Final_Game_Diff
+		Final_Away_Team_Score =  -Final_Game_Diff
+		if (Final_Game_Diff < Home_Team_ATS) and LOCK 
+	            Result = 3
+		else if (Final_Game_Diff < Home_Team_ATS) and No LOCK 
+	            Result = 2
+		else if (Final_Game_Diff == Home_Team_ATS)
+		    Result = 1
+	        else if (Final_Game_Diff > Home_Team_ATS) and No Lock
+		    Result = 0
+		else if (Final_Game_Diff > Home_Team_ATS) and Lock
+	            Result = -1
+	}
+
+
