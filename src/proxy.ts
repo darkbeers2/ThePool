@@ -6,7 +6,7 @@ import { getToken } from "next-auth/jwt";
  * Edge-safe gate: avoid importing `auth` from `@/auth` here because that pulls
  * in `pg` (Node-only) and breaks the Edge middleware bundle.
  */
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET,
