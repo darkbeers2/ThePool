@@ -2,10 +2,11 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { getPool } from "@/lib/db";
-import { upsertPlayerFromGoogle, verifyPlayerCredentials } from "@/lib/players";
+import { getPlayerForGoogleLogin, findPlayerByEmail, verifyPlayerCredentials } from "@/lib/players";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
+  secret: process.env.AUTH_SECRET,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -51,6 +52,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 60 * 60 * 24 * 180,
   },
   callbacks: {
+    async signIn({ account, profile }) {
+      if (account?.provider === "google") {
+        const email =
+          typeof profile?.email === "string" ? profile.email.trim() : "";
+        if (!email) {
+          return false;
+        }
+        const pool = getPool();
+        const player = await findPlayerByEmail(pool, email);
+        return player !== null;
+      }
+      return true;
+    },
     async jwt({ token, account, profile, user }) {
       if (user && "playerId" in user && typeof user.playerId === "number") {
         token.playerId = user.playerId;
@@ -65,10 +79,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           profile.email.split("@")[0] ||
           "Player";
         const pool = getPool();
-        const player = await upsertPlayerFromGoogle(pool, {
+        const player = await getPlayerForGoogleLogin(pool, {
           email: profile.email,
           name,
         });
+        if (!player) {
+          return token;
+        }
         token.playerId = player.Player_ID;
         token.playerName = player.Player_Name;
       }
@@ -90,3 +107,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
 });
+

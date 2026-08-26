@@ -1,6 +1,16 @@
 import { signInWithGoogle } from "./actions";
 import { CredentialsLoginForm } from "./CredentialsLoginForm";
 
+function googleAuthErrorMessage(error: string | undefined): string | null {
+  if (!error) {
+    return null;
+  }
+  if (error === "AccessDenied") {
+    return "This Google account is not registered for The Pool. Ask the commissioner to add your email.";
+  }
+  return "Google sign-in failed. Try again or use site credentials.";
+}
+
 export default function LoginPage() {
   const googleConfigured = Boolean(
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
