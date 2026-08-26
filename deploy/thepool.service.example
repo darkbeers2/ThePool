@@ -1,0 +1,25 @@
+# Install:
+#   sudo cp deploy/thepool.service.example /etc/systemd/system/thepool.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable thepool
+#   sudo systemctl start thepool
+#
+# Replace YOUR_USER and /path/to/ThePool with your droplet values.
+
+[Unit]
+Description=ThePool Next.js app
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=YOUR_USER
+WorkingDirectory=/path/to/ThePool
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

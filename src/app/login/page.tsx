@@ -11,10 +11,15 @@ function googleAuthErrorMessage(error: string | undefined): string | null {
   return "Google sign-in failed. Try again or use site credentials.";
 }
 
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { error?: string };
+}) {
   const googleConfigured = Boolean(
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
   );
+  const googleError = googleAuthErrorMessage(searchParams?.error);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-pool-navy to-slate-900 px-4">
@@ -48,6 +53,11 @@ export default function LoginPage() {
               Google account
             </h2>
             <div className="mt-3">
+              {googleError ? (
+                <div className="mb-3 rounded-lg border border-red-800/60 bg-red-950/40 px-3 py-2 text-sm text-red-200">
+                  {googleError}
+                </div>
+              ) : null}
               {googleConfigured ? (
                 <form action={signInWithGoogle}>
                   <button
@@ -97,3 +107,4 @@ function GoogleMark() {
     </svg>
   );
 }
+
