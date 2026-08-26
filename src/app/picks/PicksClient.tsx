@@ -255,7 +255,7 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
 
   const headerNote = useMemo(() => {
     if (!pickWindowOpen) {
-      return `Picks open Wednesday 12:00 PM – Saturday 12:00 PM (ET). Currently: ${windowState.label}.`;
+      return `Picks open Wednesday 12:00 PM – Saturday 12:00 PM (ET).`;
     }
     return "Wednesday 12:00 PM – Saturday 12:00 PM (ET)";
   }, [pickWindowOpen, windowState.label]);

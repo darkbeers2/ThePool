@@ -1,0 +1,46 @@
+# Install (Debian/Ubuntu Apache):
+#   sudo cp deploy/apache-thepool.conf.example /etc/apache2/sites-available/thepool.conf
+#   sudo a2enmod proxy proxy_http headers rewrite
+#   sudo a2ensite thepool
+#   sudo apache2ctl configtest
+#   sudo systemctl reload apache2
+#
+# Replace thepool.example.com with your domain or droplet IP.
+# If you terminate HTTPS in Apache (recommended), use the :443 block and
+# redirect HTTP to HTTPS.
+
+<VirtualHost *:80>
+    ServerName thepool.example.com
+
+    # Uncomment after SSL is configured:
+    # Redirect permanent / https://thepool.example.com/
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:3000/
+    ProxyPassReverse / http://127.0.0.1:3000/
+
+    RequestHeader set X-Forwarded-Proto "http"
+    RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}s"
+
+    ErrorLog ${APACHE_LOG_DIR}/thepool-error.log
+    CustomLog ${APACHE_LOG_DIR}/thepool-access.log combined
+</VirtualHost>
+
+# Example HTTPS vhost (after certbot or your own cert):
+#<VirtualHost *:443>
+#    ServerName thepool.example.com
+#
+#    SSLEngine on
+#    SSLCertificateFile /etc/letsencrypt/live/thepool.example.com/fullchain.pem
+#    SSLCertificateKeyFile /etc/letsencrypt/live/thepool.example.com/privkey.pem
+#
+#    ProxyPreserveHost On
+#    ProxyPass / http://127.0.0.1:3000/
+#    ProxyPassReverse / http://127.0.0.1:3000/
+#
+#    RequestHeader set X-Forwarded-Proto "https"
+#    RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}s"
+#
+#    ErrorLog ${APACHE_LOG_DIR}/thepool-ssl-error.log
+#    CustomLog ${APACHE_LOG_DIR}/thepool-ssl-access.log combined
+#</VirtualHost>

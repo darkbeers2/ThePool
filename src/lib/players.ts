@@ -53,29 +53,22 @@ export async function verifyPlayerCredentials(
   return ok ? player : null;
 }
 
-export async function upsertPlayerFromGoogle(
+export async function getPlayerForGoogleLogin(
   pool: Pool,
   params: { email: string; name: string },
-): Promise<PlayerRow> {
+): Promise<PlayerRow | null> {
   const existing = await findPlayerByEmail(pool, params.email);
-  if (existing) {
-    if (existing.Player_Name !== params.name) {
-      await pool.query(
-        `UPDATE public."Players" SET "Player_Name" = $1 WHERE "Player_ID" = $2`,
-        [params.name, existing.Player_ID],
-      );
-      return { ...existing, Player_Name: params.name };
-    }
-    return existing;
+  if (!existing) {
+    return null;
   }
 
-  const { rows } = await pool.query<PlayerRow>(
-    `INSERT INTO public."Players" ("Player_Name", "Player_Email")
-     VALUES ($1, $2)
-     RETURNING "Player_ID", "Player_Name", "Player_Email"`,
-    [params.name, params.email],
-  );
-  const created = rows[0];
-  if (!created) throw new Error("Failed to create player");
-  return created;
+  if (existing.Player_Name !== params.name) {
+    await pool.query(
+      `UPDATE public."Players" SET "Player_Name" = $1 WHERE "Player_ID" = $2`,
+      [params.name, existing.Player_ID],
+    );
+    return { ...existing, Player_Name: params.name };
+  }
+
+  return existing;
 }
