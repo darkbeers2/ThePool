@@ -1,7 +1,6 @@
 "use client";
 
-import type { EventRow } from "@/app/api/events/route";
-import type { MyPickRow } from "@/app/api/my-picks/route";
+import type { EventRow, MyPickRow } from "@/types/picks";
 import type { PoolWindow } from "@/lib/pool-week";
 import {
   formatSpread,
@@ -258,7 +257,7 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
       return `Picks open Wednesday 12:00 PM – Saturday 12:00 PM (ET).`;
     }
     return "Wednesday 12:00 PM – Saturday 12:00 PM (ET)";
-  }, [pickWindowOpen, windowState.label]);
+  }, [pickWindowOpen]);
 
   if (!pickWindowOpen) {
     return (

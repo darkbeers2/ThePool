@@ -1,18 +1,12 @@
 import { auth } from "@/auth";
+import { gameHasNotStartedSql } from "@/lib/game-start-time";
 import { getPool } from "@/lib/db";
 import { resolvePlayerPicksWeek } from "@/lib/player-picks-week";
 import { isPickWindowOpen } from "@/lib/pool-week";
+import type { EventRow } from "@/types/picks";
 import { NextResponse } from "next/server";
 
-export type EventRow = {
-  Game_ID: string;
-  FK_Week: number;
-  Home_Team_Name: string;
-  Away_Team_Name: string;
-  Home_Team_ATS: string | null;
-  Away_Team_ATS: string | null;
-  Game_Start_Time: string;
-};
+export type { EventRow } from "@/types/picks";
 
 export async function GET() {
   const session = await auth();
@@ -33,7 +27,7 @@ export async function GET() {
       `SELECT "Game_ID", "FK_Week", "Home_Team_Name", "Away_Team_Name",
               "Home_Team_ATS"::text, "Away_Team_ATS"::text, "Game_Start_Time"::text
        FROM public."Events"
-       WHERE "FK_Week" = $1 AND "Game_Start_Time" > NOW()
+       WHERE "FK_Week" = $1 AND ${gameHasNotStartedSql}
        ORDER BY "Game_Start_Time" ASC, "Home_Team_Name" ASC`,
       [week],
     );
