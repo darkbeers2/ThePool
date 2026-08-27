@@ -1,13 +1,16 @@
 import { auth } from "@/auth";
+import { gameHasStartedSql } from "@/lib/game-start-time";
 import { getPool } from "@/lib/db";
 import {
   pickSideFromRow,
   resolvePlayerPicksWeek,
-  type PickSide,
 } from "@/lib/player-picks-week";
 import { isPickWindowOpen } from "@/lib/pool-week";
+import type { MyPickRow } from "@/types/picks";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
+export type { MyPickRow } from "@/types/picks";
 
 const pickSchema = z.object({
   gameId: z.string().min(1),
@@ -18,19 +21,6 @@ const pickSchema = z.object({
 const bodySchema = z.object({
   picks: z.array(pickSchema).length(5),
 });
-
-export type MyPickRow = {
-  FK_Game_ID: string;
-  Home_Team_Name: string | null;
-  Away_Team_Name: string | null;
-  Home_Team_ATS: string | null;
-  Away_Team_ATS: string | null;
-  FK_Week: number;
-  Is_Lock: boolean | null;
-  Game_Start_Time: string;
-  isStarted: boolean;
-  side: PickSide | null;
-};
 
 type ExistingPickRow = {
   FK_Game_ID: string;
@@ -71,7 +61,7 @@ export async function GET() {
               pp."Result", pp."Is_Push", pp."Is_Game_Over",
               pp."Final_Home_Team_Score", pp."Final_Away_Team_Score",
               e."Game_Start_Time",
-              (e."Game_Start_Time" <= NOW()) AS is_started
+              (${gameHasStartedSql}) AS is_started
        FROM public."PlayerPick" pp
        INNER JOIN public."Events" e ON e."Game_ID" = pp."FK_Game_ID"
        WHERE pp."FK_Player_ID" = $1 AND pp."FK_Week" = $2
@@ -157,7 +147,7 @@ export async function POST(req: Request) {
               pp."Result", pp."Is_Push", pp."Is_Game_Over",
               pp."Final_Home_Team_Score", pp."Final_Away_Team_Score",
               e."Game_Start_Time",
-              (e."Game_Start_Time" <= NOW()) AS is_started
+              (${gameHasStartedSql}) AS is_started
        FROM public."PlayerPick" pp
        INNER JOIN public."Events" e ON e."Game_ID" = pp."FK_Game_ID"
        WHERE pp."FK_Player_ID" = $1 AND pp."FK_Week" = $2`,
@@ -173,9 +163,11 @@ export async function POST(req: Request) {
       Home_Team_ATS: string | null;
       Away_Team_ATS: string | null;
       Game_Start_Time: Date;
+      is_started: boolean;
     }>(
       `SELECT "Game_ID", "FK_Week", "Home_Team_Name", "Away_Team_Name",
-              "Home_Team_ATS", "Away_Team_ATS", "Game_Start_Time"
+              "Home_Team_ATS", "Away_Team_ATS", "Game_Start_Time",
+              (${gameHasStartedSql}) AS is_started
        FROM public."Events"
        WHERE "Game_ID" = ANY($1::varchar[])`,
       [gameIds],
@@ -204,7 +196,7 @@ export async function POST(req: Request) {
       const ev = eventById.get(pick.gameId);
       if (!ev) continue;
       const prev = existingByGame.get(pick.gameId);
-      const started = ev.Game_Start_Time <= new Date();
+      const started = ev.is_started;
 
       if (started) {
         if (!prev) {
@@ -239,7 +231,7 @@ export async function POST(req: Request) {
     for (const pick of incoming) {
       const ev = eventById.get(pick.gameId)!;
       const prev = existingByGame.get(pick.gameId);
-      const started = ev.Game_Start_Time <= new Date();
+      const started = ev.is_started;
       const homeAts = pick.side === "home" ? ev.Home_Team_ATS : null;
       const awayAts = pick.side === "away" ? ev.Away_Team_ATS : null;
 
