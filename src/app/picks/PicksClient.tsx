@@ -58,6 +58,11 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
       if (evRes.status === 403 || pickRes.status === 403) {
         setBoardRows([]);
         setDraft({});
+        setWindowState((prev) => ({
+          ...prev,
+          pickOpen: false,
+          kind: "closed",
+        }));
         await refreshWindow();
         setLoading(false);
         return;
@@ -123,8 +128,7 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
     void refreshWindow();
   }, [refreshWindow]);
 
-  const pickWindowOpen =
-    windowState.pickOpen === true || windowState.kind === "pick";
+  const pickWindowOpen = windowState.pickOpen === true;
 
   useEffect(() => {
     if (pickWindowOpen) {
@@ -264,10 +268,6 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
       <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-6">
         <h1 className="text-xl font-semibold">Player Picks</h1>
         <p className="mt-3 text-slate-300">{headerNote}</p>
-        <p className="mt-2 text-sm text-slate-400">
-          During the pick window, choose five games and pick the home or away
-          team for each. You may designate one pick as a lock.
-        </p>
       </div>
     );
   }
@@ -318,13 +318,7 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
 
       {loading ? (
         <p className="text-slate-400">Loading games…</p>
-      ) : boardRows.length === 0 ? (
-        <p className="text-slate-400">
-          No games found for the active week. Check{" "}
-          <code className="text-xs">EventWeeks</code> and{" "}
-          <code className="text-xs">Events</code>.
-        </p>
-      ) : (
+      ) : boardRows.length === 0 ? null : (
         <div className="overflow-x-auto rounded-xl border border-slate-700">
           <table className="min-w-full border-collapse text-left text-sm">
             <thead>
