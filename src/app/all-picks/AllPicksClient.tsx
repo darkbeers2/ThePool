@@ -125,6 +125,15 @@ export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow })
         </p>
       </div>
 
+      <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+        <Legend swatch="white" label="No results" />
+        <Legend swatch="lawngreen" label="Win with lock" />
+        <Legend swatch="cyan" label="Win no lock" />
+        <Legend swatch="lightslategrey" label="Push" />
+        <Legend swatch="yellow" label="Loss no lock" />
+        <Legend swatch="pink" label="Loss with lock" />
+      </div>
+
       {error ? (
         <div className="rounded-lg border border-red-800/60 bg-red-950/40 px-3 py-2 text-sm text-red-200">
           {error}
