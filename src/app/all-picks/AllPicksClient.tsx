@@ -5,6 +5,13 @@ import type { PoolWindow } from "@/lib/pool-week";
 import { playerPickCellBackground } from "@/lib/pick-colors";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+
+function formatLock(value: boolean): string {
+  const n = Boolean(value);
+  if (n === true) return " (Lock)";
+  else return " ";
+}
+
 function formatSpread(value: string): string {
   const n = Number(value);
   if (Number.isNaN(n)) return value;
@@ -13,17 +20,19 @@ function formatSpread(value: string): string {
 
 function pickDisplay(
   p: PlayerPickRow,
-): { name: string; ats: string } | null {
+): { name: string; ats: string; lock: string } | null {
   if (p.Home_Team_ATS != null && p.Home_Team_ATS !== "") {
     return {
       name: p.Home_Team_Name ?? "Home",
       ats: formatSpread(p.Home_Team_ATS),
+      lock: formatLock(p.Is_Lock ?? false),
     };
   }
   if (p.Away_Team_ATS != null && p.Away_Team_ATS !== "") {
     return {
       name: p.Away_Team_Name ?? "Away",
       ats: formatSpread(p.Away_Team_ATS),
+      lock: formatLock(p.Is_Lock ?? false),
     };
   }
   return null;
@@ -193,7 +202,7 @@ export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow })
                       >
                         {display ? (
                           <>
-                            <div>{display.name}</div>
+                            <div>{display.name}{display.lock}</div>
                             <div className="mt-0.5 font-medium">{display.ats}</div>
                           </>
                         ) : (
