@@ -308,6 +308,25 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
         </div>
       ) : null}
 
+      {selectedSummary.length > 0 && !loading ? (
+        <div className="rounded-lg border border-slate-700/80 bg-slate-900/30 p-4">
+          <p className="text-sm font-medium text-slate-200">Your selections</p>
+          <ol className="mt-2 list-inside list-decimal space-y-1 text-sm text-slate-300">
+            {selectedSummary.map((item) => (
+              <li key={item.gameId}>
+                {item.label}
+                {item.isLock ? (
+                  <span className="ml-2 font-semibold text-amber-300">LOCK</span>
+                ) : null}
+                {item.readOnly ? (
+                  <span className="ml-2 text-xs text-slate-500">(read-only)</span>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3">
         <p className="text-sm text-slate-300">
           Picks:{" "}
