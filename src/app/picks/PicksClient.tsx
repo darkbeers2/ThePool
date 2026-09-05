@@ -29,7 +29,9 @@ function fmtStartTime(iso: string): string {
   });
 }
 
-type PoolWindowState = PoolWindow & { pickOpen?: boolean };
+type PoolWindowState = PoolWindow & { pickOpen?: boolean; revealOpen?: boolean };
+
+const WINDOW_POLL_MS = 30_000;
 
 export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
   const [windowState, setWindowState] = useState<PoolWindowState>(initialWindow);
@@ -58,12 +60,15 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
       if (evRes.status === 403 || pickRes.status === 403) {
         setBoardRows([]);
         setDraft({});
-        setWindowState((prev) => ({
-          ...prev,
+        const w = await fetch("/api/pool/window");
+        const j = w.ok
+          ? ((await w.json()) as PoolWindowState)
+          : ({ kind: "closed", label: "", pickOpen: false } as PoolWindowState);
+        setWindowState({
+          ...j,
           pickOpen: false,
-          kind: "closed",
-        }));
-        await refreshWindow();
+          kind: j.kind === "pick" ? "closed" : j.kind,
+        });
         setLoading(false);
         return;
       }
@@ -122,13 +127,18 @@ export function PicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
     } finally {
       setLoading(false);
     }
-  }, [refreshWindow]);
+  }, []);
 
   useEffect(() => {
     void refreshWindow();
+    const id = setInterval(() => {
+      void refreshWindow();
+    }, WINDOW_POLL_MS);
+    return () => clearInterval(id);
   }, [refreshWindow]);
 
-  const pickWindowOpen = windowState.pickOpen === true;
+  const pickWindowOpen =
+    windowState.pickOpen === true && windowState.kind === "pick";
 
   useEffect(() => {
     if (pickWindowOpen) {

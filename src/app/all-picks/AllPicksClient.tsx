@@ -38,8 +38,12 @@ function pickDisplay(
   return null;
 }
 
+type PoolWindowState = PoolWindow & { pickOpen?: boolean; revealOpen?: boolean };
+
+const WINDOW_POLL_MS = 30_000;
+
 export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow }) {
-  const [windowState, setWindowState] = useState<PoolWindow>(initialWindow);
+  const [windowState, setWindowState] = useState<PoolWindowState>(initialWindow);
   const [week, setWeek] = useState<number | null>(null);
   const [picks, setPicks] = useState<PlayerPickRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,8 +51,11 @@ export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow })
 
   const refreshWindow = useCallback(async () => {
     const r = await fetch("/api/pool/window");
-    if (r.ok) setWindowState((await r.json()) as PoolWindow);
+    if (r.ok) setWindowState((await r.json()) as PoolWindowState);
   }, []);
+
+  const revealOpen =
+    windowState.revealOpen === true || windowState.kind === "reveal";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -77,16 +84,20 @@ export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow })
 
   useEffect(() => {
     void refreshWindow();
+    const id = setInterval(() => {
+      void refreshWindow();
+    }, WINDOW_POLL_MS);
+    return () => clearInterval(id);
   }, [refreshWindow]);
 
   useEffect(() => {
-    if (windowState.kind === "reveal") {
+    if (revealOpen) {
       void load();
     } else {
       setPicks([]);
       setLoading(false);
     }
-  }, [windowState.kind, load]);
+  }, [revealOpen, load]);
 
   const grid = useMemo(() => {
     const byPlayer = new Map<number, { name: string; picks: PlayerPickRow[] }>();
@@ -111,7 +122,7 @@ export function AllPicksClient({ initialWindow }: { initialWindow: PoolWindow })
     }));
   }, [picks]);
 
-  if (windowState.kind !== "reveal") {
+  if (!revealOpen) {
     return (
       <div className="rounded-xl border border-slate-700 bg-slate-900/40 p-6">
         <h1 className="text-xl font-semibold">All Picks</h1>
