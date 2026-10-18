@@ -87,6 +87,18 @@ export function RankingsClient() {
               <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
                 Total
               </th>
+              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
+                1st Half Points
+              </th>
+              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
+                1st Half Rank
+              </th>
+              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
+                2nd Half Points
+              </th>
+              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
+                2nd Half Rank
+              </th>
               {weekColumns.map((c) => (
                 <th
                   key={c}
@@ -97,12 +109,6 @@ export function RankingsClient() {
               ))}
               <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
                 Total
-              </th>
-              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
-                2H
-              </th>
-              <th className="border border-slate-700 px-2 py-2 font-medium text-slate-200">
-                2H Rnk
               </th>
             </tr>
           </thead>
@@ -118,6 +124,18 @@ export function RankingsClient() {
                 <td className="border border-slate-700 px-2 py-1.5 text-right font-medium text-white">
                   {r.Total ?? "—"}
                 </td>
+                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
+                  {r.FirstHalf ?? "—"}
+                </td>
+                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
+                  {r.FirstHalfRank ?? "—"}
+                </td>
+                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
+                  {r.SecondHalf ?? "—"}
+                </td>
+                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
+                  {r.SecondHalfRank ?? "—"}
+                </td>
                 {weekColumns.map((c) => (
                   <td
                     key={c}
@@ -128,12 +146,6 @@ export function RankingsClient() {
                 ))}
                 <td className="border border-slate-700 px-2 py-1.5 text-right font-medium text-white">
                   {r.Total ?? "—"}
-                </td>
-                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
-                  {r.SecondHalf ?? "—"}
-                </td>
-                <td className="border border-slate-700 px-2 py-1.5 text-right text-slate-300">
-                  {r.SecondHalfRank ?? "—"}
                 </td>
               </tr>
             ))}

@@ -22,6 +22,8 @@ export type SummaryRow = {
   BowlWeek: number | null;
   NC: number | null;
   Total: number | null;
+  FirstHalf: number | null;
+  FirstHalfRank: number | null;
   SecondHalf: number | null;
   SecondHalfRank: number | null;
   Week15: number | null;
@@ -40,7 +42,7 @@ export async function GET() {
       `SELECT s."FK_Player_ID", s."Rank", s."Week1", s."Week2", s."Week3", s."Week4",
               s."Week5", s."Week6", s."Week7", s."Week8", s."Week9", s."Week10",
               s."Week11", s."Week12", s."Week13", s."Week14", s."BowlWeek", s."NC",
-              s."Total", s."SecondHalf", s."SecondHalfRank", s."Week15",
+              s."Total", s."FirstHalf", s."FirstHalfRank", s."SecondHalf", s."SecondHalfRank", s."Week15",
               p."Player_Name"
        FROM public."Summary" s
        INNER JOIN public."Players" p ON p."Player_ID" = s."FK_Player_ID"
