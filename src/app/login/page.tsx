@@ -25,7 +25,7 @@ export default function LoginPage({
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-pool-navy to-slate-900 px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-700/80 bg-pool-slate/80 p-8 shadow-xl backdrop-blur">
         <h1 className="text-center text-2xl font-semibold tracking-tight">
-          Kohler&apos;s CFB ATS League 
+          The Pool
         </h1>
         <p className="mt-2 text-center text-sm text-slate-400">
           College football — five ATS picks each week
